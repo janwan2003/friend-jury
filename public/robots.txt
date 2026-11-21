@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /c/
+Disallow: /api/
+Sitemap: https://pb-friend-jury.jan-bef.workers.dev/sitemap.xml

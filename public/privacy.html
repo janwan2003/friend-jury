@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacy · Jurybox</title>
+  <meta name="description" content="What Jurybox stores, for how long, and how to delete it.">
+  <meta property="og:title" content="Privacy · Jurybox">
+  <meta property="og:description" content="What Jurybox stores, for how long, and how to delete it.">
+  <meta property="og:image" content="https://pb-friend-jury.jan-bef.workers.dev/og.png">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/app.css">
+</head>
+<body>
+  <header class="wrap top"><a class="brand" href="/"><img src="/icon.svg" alt="" width="30" height="30">Jurybox</a><nav><a href="/">Open a case</a></nav></header>
+  <main class="wrap prose">
+    <h1>Privacy</h1>
+    <p class="muted">Last updated 21 November 2026.</p>
+    <p>Jurybox is built to need as little about you as possible. There are no accounts, no ads and no tracking cookies.</p>
+    <h2>What we store</h2>
+    <ul>
+      <li><strong>The case:</strong> the question, each side’s name and argument, the deadline you picked.</li>
+      <li><strong>Votes:</strong> each juror’s nickname, the side they picked and their optional one-line ruling, plus rulings’ upvotes.</li>
+      <li><strong>A random browser key:</strong> your browser makes a random key and keeps it in local storage, so the site knows which case is yours and which vote is yours. We store only a one-way hash of it.</li>
+      <li><strong>Abuse limits:</strong> your IP address is used to count requests per hour so nobody can flood the service. These counters are deleted within two hours.</li>
+    </ul>
+    <h2>Who can see it</h2>
+    <p>Anyone with a case link can read the case. Until the verdict, nobody can see how anyone voted or what they wrote as a ruling; jurors’ nicknames are visible. If the sides chose to hide their names, the jury sees “Orange” and “Blue” until the verdict.</p>
+    <h2>How long we keep it</h2>
+    <p>Each case and its votes are deleted automatically 60 days after the case was opened. Either side can delete a case at any time with “Delete case”; the invited person can decline, which deletes it too.</p>
+    <h2>Who runs the servers</h2>
+    <p>Jurybox runs on Cloudflare Workers. Cloudflare processes requests to deliver the site. We don’t sell or share data with anyone.</p>
+    <h2>Children</h2>
+    <p>Jurybox is a general-audience game and does not knowingly collect information from children under 13.</p>
+    <h2>Contact</h2>
+    <p>Questions or a removal request: open an issue at <a href="https://github.com/janwan2003/friend-jury/issues">github.com/janwan2003/friend-jury</a>.</p>
+  </main>
+  <footer class="foot"><div class="wrap"><span>Jurybox: let your friends settle the argument.</span><span><a href="/about">About</a> · <a href="/privacy">Privacy</a></span></div></footer>
+</body>
+</html>

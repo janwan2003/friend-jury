@@ -1,0 +1,27 @@
+name = "pb-friend-jury"
+main = "src/worker.js"
+compatibility_date = "2025-11-01"
+workers_dev = true
+preview_urls = false
+
+[assets]
+directory = "public"
+binding = "ASSETS"
+html_handling = "auto-trailing-slash"
+not_found_handling = "404-page"
+run_worker_first = ["/api/*", "/c/*"]
+
+[[durable_objects.bindings]]
+name = "CASE"
+class_name = "Case"
+
+[[durable_objects.bindings]]
+name = "LIMITER"
+class_name = "Limiter"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Case", "Limiter"]
+
+[observability]
+enabled = false

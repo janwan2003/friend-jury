@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Jurybox: let your friends settle the argument</title>
+  <meta name="description" content="Settle an argument with a secret vote from your group chat. Both sides write their case, friends vote in secret, and the jury rules at the deadline. Free, no app, no sign-up.">
+  <link rel="canonical" href="https://pb-friend-jury.jan-bef.workers.dev/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Jurybox">
+  <meta property="og:title" content="Jurybox: let your friends settle the argument">
+  <meta property="og:description" content="Both sides write their case, your group chat votes in secret, the jury rules at the deadline. Free, no app, no sign-up.">
+  <meta property="og:image" content="https://pb-friend-jury.jan-bef.workers.dev/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:url" content="https://pb-friend-jury.jan-bef.workers.dev/">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="google-site-verification" content="E5DqnLJA_s_0vDF_tH9irMHn6LYxN-jg28IQng7LaKc" />
+<meta name="theme-color" content="#f8f4ea">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icon-180.png">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="stylesheet" href="/app.css">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Jurybox","applicationCategory":"GameApplication","operatingSystem":"Any","description":"Settle an argument with a secret vote from your group chat.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"url":"https://pb-friend-jury.jan-bef.workers.dev/"}</script>
+</head>
+<body>
+  <header class="wrap top">
+    <a class="brand" href="/"><span id="logo"></span>Jurybox</a>
+    <nav><a class="hide-s" href="#how">How it works</a><a href="#classics">Classic debates</a></nav>
+  </header>
+
+  <main>
+    <div class="wrap hero">
+      <div>
+        <span class="kicker">The court of your group chat</span>
+        <h1>Settle it. Let your friends be the jury.</h1>
+        <p class="lede">Write the argument and send one link. The other side adds their case, your group chat votes in secret, and the jury rules when the time runs out.</p>
+        <ul class="ticks">
+          <li>Both sides get their say, so it’s fair</li>
+          <li>Secret votes until the verdict, so nobody copies the crowd</li>
+          <li>A verdict card worth posting (or denying)</li>
+          <li>Free, no app, no sign-up</li>
+        </ul>
+        <div class="panel sample" aria-hidden="true" style="margin-top:28px">
+          <div class="verdict">
+            <div class="ruled">THE JURY HAS RULED</div>
+            <div class="docket" style="margin-top:6px;text-transform:none;letter-spacing:0;font-size:.95rem">“Does soaking a pan for three days count as washing it?”</div>
+            <div class="head">Maya is right (7–2)</div>
+            <span class="stamp" style="animation:none">MAJORITY</span>
+            <div class="split"><span class="a" style="width:78%"></span><span class="b" style="width:22%"></span></div>
+            <div class="quote">“Nobody soaks a pan for three days. That’s storage.”</div>
+            <div class="quote-by">juror Priya</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" id="create">
+        <h2 style="font-size:1.35rem">Open a case</h2>
+        <div class="tabs" role="tablist">
+          <button type="button" role="tab" id="tab-dispute" aria-selected="true">Me vs someone</button>
+          <button type="button" role="tab" id="tab-debate" aria-selected="false">Just a debate</button>
+        </div>
+
+        <form id="f-dispute" novalidate>
+          <label for="d-q">What’s the argument? <span class="count" id="d-q-c"></span></label>
+          <input type="text" id="d-q" maxlength="90" placeholder="Does leaving a pan to “soak” count as washing it?" autocomplete="off">
+          <label for="d-name">Your name</label>
+          <input type="text" id="d-name" maxlength="24" placeholder="Maya" autocomplete="given-name">
+          <label for="d-text">Your side <span class="count" id="d-text-c"></span></label>
+          <textarea id="d-text" maxlength="160" placeholder="It’s been three days. That’s not soaking, that’s storage."></textarea>
+          <div class="row">
+            <div>
+              <label for="d-hours">Jury has</label>
+              <select id="d-hours"><option value="1">1 hour</option><option value="2" selected>2 hours</option><option value="6">6 hours</option><option value="24">24 hours</option></select>
+            </div>
+            <div></div>
+          </div>
+          <label class="check"><input type="checkbox" id="d-blind" checked> <span>Hide our names from the jury until the verdict <span class="hint">(fairer: sides show as Orange and Blue)</span></span></label>
+          <button class="btn block" type="submit">Open the case</button>
+          <p class="muted small" style="margin:10px 0 0">Next you’ll get a link for the other person to add their side. Then you both send the case to the group chat.</p>
+          <p class="err" id="d-err" role="alert"></p>
+        </form>
+
+        <form id="f-debate" novalidate hidden>
+          <label for="b-q">The question <span class="count" id="b-q-c"></span></label>
+          <input type="text" id="b-q" maxlength="90" placeholder="Is a hot dog a sandwich?" autocomplete="off">
+          <div class="side-box o">
+            <div class="lg" style="margin-top:10px">Orange side</div>
+            <label for="b-al">Short name</label>
+            <input type="text" id="b-al" maxlength="32" placeholder="Yes, it’s a sandwich">
+            <label for="b-at">Argument</label>
+            <textarea id="b-at" maxlength="160" placeholder="Meat in bread is a sandwich."></textarea>
+          </div>
+          <div class="side-box b">
+            <div class="lg" style="margin-top:10px">Blue side</div>
+            <label for="b-bl">Short name</label>
+            <input type="text" id="b-bl" maxlength="32" placeholder="No, it’s its own thing">
+            <label for="b-bt">Argument</label>
+            <textarea id="b-bt" maxlength="160" placeholder="Nobody orders a sandwich and is happy to get a hot dog."></textarea>
+          </div>
+          <div class="row">
+            <div>
+              <label for="b-hours">Jury has</label>
+              <select id="b-hours"><option value="1">1 hour</option><option value="2" selected>2 hours</option><option value="6">6 hours</option><option value="24">24 hours</option></select>
+            </div>
+            <div style="display:flex;align-items:flex-end"><button type="button" class="btn ghost" id="shuffle" style="width:100%">🎲 Pick a classic</button></div>
+          </div>
+          <button class="btn block" type="submit">Open the case</button>
+          <p class="muted small" style="margin:10px 0 0">The jury opens straight away. Send the link to your group chat; you can vote too.</p>
+          <p class="err" id="b-err" role="alert"></p>
+        </form>
+      </div>
+    </div>
+
+    <section class="block wrap" id="how">
+      <h2>How it works</h2>
+      <div class="steps">
+        <div class="step"><h3>Open the case</h3><p class="muted">Write the argument in one line and your side in two. No account.</p></div>
+        <div class="step"><h3>They answer</h3><p class="muted">Send the link to the other person. They add their side, so they agreed to be judged.</p></div>
+        <div class="step"><h3>The jury rules</h3><p class="muted">Drop the case in the group chat. Friends vote in secret with a one-line ruling. At the deadline, the court rules.</p></div>
+      </div>
+    </section>
+
+    <section class="block wrap" id="classics">
+      <h2>No argument right now? Pick a classic</h2>
+      <p class="muted">Light debates for the group chat or the family table. Tap one to fill in both sides.</p>
+      <div class="starters" id="starters"></div>
+    </section>
+
+    <section class="block wrap faq">
+      <h2>Questions</h2>
+      <details><summary>Do my friends need an app or an account?</summary><p>No. Everyone opens the link in their browser, picks a side and types a nickname. That’s it.</p></details>
+      <details><summary>Can people see how others voted?</summary><p>Not until the verdict. During the trial everyone only sees how many jurors have voted and their nicknames. When the jury rules, every vote and ruling is shown.</p></details>
+      <details><summary>When does the jury rule?</summary><p>When the time you picked runs out (1, 2, 6 or 24 hours). Either side can also call the verdict early once at least three jurors have voted.</p></details>
+      <details><summary>Can I delete a case?</summary><p>Yes. Either side can delete the case at any time, and the other person can decline the invite. Cases are deleted automatically after 60 days.</p></details>
+      <details><summary>Is it free?</summary><p>Yes. No ads, no sign-up, nothing to install.</p></details>
+    </section>
+  </main>
+
+  <footer class="foot"><div class="wrap"><span>Jurybox: let your friends settle the argument.</span><span><a href="/about">About</a> · <a href="/privacy">Privacy</a></span></div></footer>
+  <script type="module" src="/home.js"></script>
+</body>
+</html>
