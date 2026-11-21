@@ -1,13 +1,13 @@
 ---
 slug: friend-jury
-stage: idea
+stage: launched
 priority: 4
-url:
-repo:
+url: https://pb-friend-jury.jan-bef.workers.dev
+repo: https://github.com/janwan2003/friend-jury
 updated: 2026-11-21
 ---
 
-# friend-jury
+# friend-jury (product name: Jurybox)
 
 ## Thesis
 
@@ -89,6 +89,12 @@ Searches run 2026-11-21. Sources are search-result summaries, not opened pages, 
   [Gadget Hacks on Telegram polls](https://smartphones.gadgethacks.com/how-to/use-telegrams-polls-settle-arguments-group-chats-0254580)).
   Weaknesses: WhatsApp polls show who voted what and the running count (iGeeksBlog), there is no
   place for each side's case, no deadline reveal, and no result card.
+- **Re-check 2026-11-21 (builder, 2 searches, result summaries only):** more of the same shape, still none with
+  both sides + secret votes + deadline reveal on a no-install link: [Jury: Resolve Disputes Online](https://appadvice.com/post/jury-is-smartphone-app-that-lets-you-settle-disputes-with-a-jury-of-your-peers/1512949596/816252209)
+  (iOS, peer jury), [Pocket Jury](https://apps.apple.com/mx/app/pocket-jury/id6444121669) (iOS, live video verdicts),
+  [JuryNow](https://www.producthunt.com/p/self-promotion/introducing-my-new-game-jurynow-12-randomly-selected-people-give-you-a-verdict-in-3-minutes)
+  (12 random strangers), and [Settle It](https://www.producthunt.com/products/settle-it) (Product Hunt, Jan 2026: a no-account
+  one-line web poll; a commenter notes anyone with the link sees the results). "Jurybox" turned up no consumer product of that name.
 - **Gap:** no volume data for "settle an argument" searches; the demand evidence is the number of
   products and the size of AITA, not search volume.
 
@@ -109,17 +115,69 @@ Searches run 2026-11-21. Sources are search-result summaries, not opened pages, 
 
 ## Status
 
-Idea only. Nothing built. Evidence above from web search on 2026-11-21.
+**Live: https://pb-friend-jury.jan-bef.workers.dev** · product/privacy/support page: https://janwan2003.github.io/friend-jury/
+(GitHub Pages from `docs/`) · Search Console: verified (META) and sitemap submitted 2026-11-21 (`scripts/gsc.py`).
+
+Served on workers.dev, not pages.dev: the account is at the free plan's 10 D1 databases (see the 2026-11-21 inbox note from
+answer-battle), so each case is its own SQLite-backed Durable Object (`Case`, keyed by case id) behind Worker `pb-friend-jury`,
+and per-IP hourly write limits live in a `Limiter` Durable Object (create 20/h, accept 30/h, vote 120/h, other writes 300/h;
+reads 120/min per IP per case, in memory). Free plan allows 100k Durable Object requests a day; an open case page polls every
+8 s while visible (≈ 220 open-tab-hours/day). Watch this if usage grows.
+
+What exists (all verified by the e2e test below unless marked):
+- Landing (`/`): "Me vs someone" form (argument ≤90, name, side ≤160, jury time 1/2/6/24 h, hide names, on by default) and
+  "Just a debate" form (question + two sides) with "Pick a classic"; 40 original starter debates (`public/starters.js`,
+  10 holiday ones shown first in Nov–Dec); how it works; FAQ.
+- Dispute flow: A creates → page shows the invite link `/c/<id>#o=<secret>` (share sheet on phones, copy on desktop) →
+  B opens it, sees "A is taking you to court", writes their side (or declines, which deletes the case) → jury opens.
+  The invite secret lives in the URL fragment and is removed from the address bar after load.
+- Jury: anyone with `/c/<id>` votes Orange / Blue / "You're both wrong" with an optional one-line ruling and a nickname;
+  can change the vote until the verdict. Parties cannot vote (403). The API sends no choices, rulings, or (when blind)
+  side names before the verdict; only the count and juror nicknames. Duplicate nicknames and party names are rejected.
+- Verdict at the deadline, or early by either party once 3 jurors voted: headline ("Maya is right (7–2)", "You’re both
+  wrong", "Hung jury"), stamp (UNANIMOUS / MAJORITY / SPLIT DECISION / HUNG JURY), split bar, names revealed, all rulings
+  with upvotes (not your own); the most-upvoted ruling is the quote. No votes → "Case dismissed" with "Reopen for 2 hours".
+- Verdict card: 1080×1350 PNG on a canvas (share sheet with the file on phones, download on desktop) + text share.
+- After the verdict and on waiting pages: "Got a case of your own?" with 3 one-tap classic debates (the juror → creator step).
+- Link preview (`/c/<id>`): pending "Maya is taking you to court: “…”"; open "You’re on the jury: “…” / Two sides, names
+  hidden · 3 jurors have voted · verdict in 1 h 20 min"; ruled "The jury has ruled: Maya is right (2–1)". Static og.png.
+- Either side (or a debate's creator) can delete a case any time; Durable Object alarm deletes every case after 60 days.
+- CSP + security headers (`public/_headers`), privacy page, about page, 404 page, robots (disallows `/c/`), sitemap, icons, manifest.
+
+Verified 2026-11-21:
+- `node --test tests/unit/*.test.js`: 9/9 pass (input cleaning, case/side/vote validation, status, verdict outcomes and
+  stamps, best-ruling order, headline wording, time-left text).
+- `tests/e2e/run.mjs` in real Chromium (Maya desktop 1280 px; Tom, Ann, Ben, Cat phones 390 px): **PASS locally
+  (`wrangler dev`) and on production deploy f0cdb60a.** Deploy c62b6dc9 only added the Search Console meta tag; checked by
+  curl (tag served, CSP header present). The run covers: empty-form validation, HTML shown as text, pending/open/ruled
+  link previews, non-invitee can't read side A while pending, same-name check, A's page auto-switching when B accepts,
+  blind labels, the API hiding votes/rulings/names, party vote 403, duplicate nickname, vote change, call verdict, headline
+  "Maya is right (2–1)" + SPLIT DECISION, upvotes changing the quote, own-ruling upvote disabled, card PNG 1080×1350,
+  debate from a classic with the creator voting, delete → API and page 404, decline → 404, static pages 200,
+  unknown case/page 404, zero unexpected console errors (3 expected 403/409 network logs from the deliberate rejections).
+  The test deletes its cases.
+- Screenshots looked at: landing desktop, invite phone, vote phone, verdict phone, verdict card, og.png, icon.
+- Not covered: the deadline passing by itself in a browser (unit-tested via `status()`; the e2e uses "call verdict"),
+  the phone share sheet (headless Chromium has none; the desktop copy/download paths ran), iOS Safari, WhatsApp/iMessage
+  in-app browsers and real link-preview rendering, rate limits being hit.
+
+## Metrics
+
+- 2026-11-21: launched today; 0 real cases (the only cases so far were the e2e test's, deleted by the test). Source: the
+  test's own cleanup; there is no counting endpoint yet (see Next steps).
 
 ## Next steps
 
-1. Write 40 "classic debate" starter cases (hot dog sandwich, Christmas film, toilet roll direction,
-   seasonal Thanksgiving/Christmas debates) so a group with no live argument can still play.
-2. Design the verdict card and the live link preview first; they are the product.
-3. Build on Cloudflare Pages + Functions + D1 (`pb-friend-jury`): case, sides, juror votes, one-liners,
-   deadline; rate limit per IP; dynamic OG image for the preview.
-4. Playwright end-to-end test: A creates → B adds side → 3 jurors vote → reveal → card renders.
-5. Aim to be live before Christmas gatherings (by ~2026-12-15).
+1. **Seed real use before Thanksgiving (2026-11-26):** operator ask in `OPERATOR-INBOX.md`: open one real case in a family
+   or friends chat and check the WhatsApp/iMessage preview on a real phone.
+2. Weekly counts for `## Metrics` with no personal data: a Durable Object for counters (cases created, cases accepted,
+   votes, verdicts per ISO week), incremented by `Case`, read by a token-protected `/api/stats`. This is counts only, not K tracking.
+3. Quality pass: test the deadline passing in a browser (a 1-minute test-only duration behind a dev flag), iOS Safari,
+   and inside the WhatsApp in-app browser (localStorage identity survives?). Add a "personal link" so a party who opens the
+   case in another browser is still recognised as a party (today they would be treated as a juror and could vote).
+4. Dynamic OG image per case (split bar + headline) once usage justifies it; the text preview already carries live state.
+5. Group "court record": a docket per friend group (weekly cases, most-convicted member), the recurring reason to come
+   back, only once single cases get real use.
 
 ## Monetization plan
 
@@ -130,3 +188,7 @@ pack) or a one-off supporter tip once the operator can take money. No ads in the
 
 - 2026-11-21 scout: created from scouting session; evidence from 5 web searches (search-result
   summaries, pages not opened). Not built.
+- 2026-11-21 builder: re-checked evidence (2 searches: more app-only/stranger juries, Settle It web poll; no private
+  both-sides jury on a link), named it Jurybox, built and launched it on Worker + Durable Objects (D1 quota is full).
+  Verified: unit 9/9, Playwright e2e PASS locally and on production deploy f0cdb60a, Search Console verified + sitemap
+  submitted, GitHub Pages product page. Screenshots checked at 390 px and 1280 px.
